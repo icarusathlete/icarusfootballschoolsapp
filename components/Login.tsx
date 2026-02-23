@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { AuthService } from '../services/authService';
+import { loginPlayer } from '../services/userService';
 import { StorageService } from '../services/storageService';
 import { Trophy, Lock, User as UserIcon, ArrowRight, RefreshCw, AlertTriangle } from 'lucide-react';
 import { User } from '../types';
@@ -14,19 +15,25 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
     const [error, setError] = useState('');
     const [isResetting, setIsResetting] = useState(false);
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const [loading, setLoading] = useState(false);
+
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setError('');
-        
-        // Ensure data is initialized before attempting login
+        setLoading(true);
+
+        // Ensure data is initialized before attempting login (for local fallback if needed)
         StorageService.init();
-        
-        const user = AuthService.login(username, password);
-        if (user) {
-            onLogin(user);
+
+        // Use Firebase Login
+        const result = await loginPlayer(username, password);
+
+        if (result.success && result.user) {
+            onLogin(result.user as User);
         } else {
-            setError('Invalid username or password. Please try again.');
+            setError(result.message || 'Invalid username or password. Please try again.');
         }
+        setLoading(false);
     };
 
     const handleReset = () => {
@@ -60,7 +67,7 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
                 <div className="p-10">
                     <h2 className="text-2xl font-bold text-gray-800 mb-2">Welcome Back</h2>
                     <p className="text-gray-400 text-sm mb-8">Sign in to access your dashboard.</p>
-                    
+
                     {error && (
                         <div className="mb-6 p-4 bg-red-50 border border-red-100 text-red-600 text-sm rounded-2xl flex items-center gap-3 animate-in fade-in zoom-in">
                             <AlertTriangle size={18} />
@@ -73,8 +80,8 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
                             <label className="text-xs font-black text-gray-400 uppercase tracking-widest ml-1">Username</label>
                             <div className="relative">
                                 <UserIcon className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 w-5 h-5" />
-                                <input 
-                                    type="text" 
+                                <input
+                                    type="text"
                                     required
                                     className="w-full pl-12 pr-4 py-4 bg-gray-50 border-2 border-transparent rounded-2xl focus:bg-white focus:border-icarus-500 focus:ring-4 focus:ring-icarus-500/10 outline-none transition-all font-medium"
                                     placeholder="Username"
@@ -88,8 +95,8 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
                             <label className="text-xs font-black text-gray-400 uppercase tracking-widest ml-1">Password</label>
                             <div className="relative">
                                 <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 w-5 h-5" />
-                                <input 
-                                    type="password" 
+                                <input
+                                    type="password"
                                     required
                                     className="w-full pl-12 pr-4 py-4 bg-gray-50 border-2 border-transparent rounded-2xl focus:bg-white focus:border-icarus-500 focus:ring-4 focus:ring-icarus-500/10 outline-none transition-all font-medium"
                                     placeholder="Password"
@@ -99,8 +106,8 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
                             </div>
                         </div>
 
-                        <button 
-                            type="submit" 
+                        <button
+                            type="submit"
                             className="w-full bg-icarus-600 hover:bg-icarus-700 text-white font-black py-4 rounded-2xl transition-all flex items-center justify-center space-x-3 mt-8 shadow-xl shadow-icarus-600/20 active:scale-95 italic"
                             style={{ fontFamily: 'Orbitron' }}
                         >
@@ -109,7 +116,7 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
                         </button>
                     </form>
                 </div>
-                
+
                 <div className="bg-gray-50/50 p-6 flex flex-col items-center border-t border-gray-100">
                     <div className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em] mb-4">Demo Access</div>
                     <div className="flex flex-wrap justify-center gap-3">
@@ -118,7 +125,7 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
                         <span className="px-3 py-1 bg-white border border-gray-200 rounded-full text-[10px] font-mono text-gray-600 shadow-sm">leo / leo</span>
                     </div>
 
-                    <button 
+                    <button
                         onClick={handleReset}
                         disabled={isResetting}
                         className="mt-6 flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-gray-400 hover:text-icarus-600 transition-colors"
@@ -128,7 +135,7 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
                     </button>
                 </div>
             </div>
-            
+
             <p className="mt-8 text-white/30 text-[10px] font-bold uppercase tracking-[0.3em] relative z-10">
                 &copy; 2025 ICARUS ATHLETIC SYSTEMS
             </p>
