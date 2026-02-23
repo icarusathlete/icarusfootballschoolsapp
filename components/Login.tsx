@@ -120,9 +120,9 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
                 <div className="bg-gray-50/50 p-6 flex flex-col items-center border-t border-gray-100">
                     <div className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em] mb-4">Demo Access</div>
                     <div className="flex flex-wrap justify-center gap-3">
-                        <span className="px-3 py-1 bg-white border border-gray-200 rounded-full text-[10px] font-mono text-gray-600 shadow-sm">admin / admin</span>
-                        <span className="px-3 py-1 bg-white border border-gray-200 rounded-full text-[10px] font-mono text-gray-600 shadow-sm">coach / coach</span>
-                        <span className="px-3 py-1 bg-white border border-gray-200 rounded-full text-[10px] font-mono text-gray-600 shadow-sm">leo / leo</span>
+                        <span className="px-3 py-1 bg-white border border-gray-200 rounded-full text-[10px] font-mono text-gray-600 shadow-sm">admin / admin123</span>
+                        <span className="px-3 py-1 bg-white border border-gray-200 rounded-full text-[10px] font-mono text-gray-600 shadow-sm">coach / coach123</span>
+                        <span className="px-3 py-1 bg-white border border-gray-200 rounded-full text-[10px] font-mono text-gray-600 shadow-sm">leo / leo123</span>
                     </div>
 
                     <button
