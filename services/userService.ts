@@ -1,4 +1,4 @@
-import { db, auth } from '../firebase';
+import { db, auth } from './firebase';
 import { collection, addDoc, query, where, getDocs, doc, setDoc, getDoc } from 'firebase/firestore';
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
 
@@ -65,8 +65,14 @@ export async function createPlayerAccount(
 }
 
 // ✅ LOGIN: Verify credentials from Firebase Auth
-export async function loginPlayer(email: string, password: string) {
+export async function loginPlayer(identifier: string, password: string) {
     try {
+        // Automatically map plain usernames to the demo email domain
+        let email = identifier.trim();
+        if (!email.includes('@')) {
+            email = `${email.toLowerCase()}@icarus.demo`;
+        }
+
         const userCredential = await signInWithEmailAndPassword(auth, email, password);
         const uid = userCredential.user.uid;
 
