@@ -3,12 +3,14 @@ import React, { useEffect, useState, useRef } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, Legend, AreaChart, Area } from 'recharts';
 import { StorageService } from '../services/storageService';
 import { Player, AttendanceRecord, AttendanceStatus, AcademySettings } from '../types';
+import { getAllPlayers } from '../services/userService';
 import { FileText, Loader2, TrendingUp, Download, Upload, Trash2, Database, Palette, Type, Image as ImageIcon, CheckCircle, AlertTriangle, FileJson, X, Settings, ChevronRight, Users, Activity } from 'lucide-react';
 
 export const AdminDashboard: React.FC = () => {
     const [players, setPlayers] = useState<Player[]>([]);
     const [attendance, setAttendance] = useState<AttendanceRecord[]>([]);
     const [chartData, setChartData] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
 
     // Settings State
     const [settings, setSettings] = useState<AcademySettings>(StorageService.getSettings());
@@ -24,13 +26,25 @@ export const AdminDashboard: React.FC = () => {
     });
     const [importedContent, setImportedContent] = useState<string>('');
 
-    const loadData = () => {
-        const p = StorageService.getPlayers();
-        const a = StorageService.getAttendance();
-        setPlayers(p);
-        setAttendance(a);
-        prepareChartData(a);
-        setSettings(StorageService.getSettings());
+    const loadData = async () => {
+        setLoading(true);
+        try {
+            // Fetch from Firestore
+            const result = await getAllPlayers();
+            if (result.success) {
+                setPlayers(result.players);
+            }
+
+            // Fallback to local storage for attendance for now (until service updated)
+            const a = StorageService.getAttendance();
+            setAttendance(a || []);
+            prepareChartData(a || []);
+            setSettings(StorageService.getSettings());
+        } catch (error) {
+            console.error("Failed to load dashboard data:", error);
+        } finally {
+            setLoading(false);
+        }
     };
 
     useEffect(() => {
@@ -143,6 +157,15 @@ export const AdminDashboard: React.FC = () => {
     const avgAttendance = totalSessions > 0
         ? Math.round((overallPresence / (totalSessions * (players.length || 1))) * 100)
         : 0;
+
+    if (loading) {
+        return (
+            <div className="flex items-center justify-center min-h-[400px]">
+                <Loader2 className="w-8 h-8 text-icarus-500 animate-spin" />
+                <span className="ml-3 font-bold text-gray-500">Loading Dashboard...</span>
+            </div>
+        );
+    }
 
     return (
         <div className="space-y-8 pb-12 relative animate-in fade-in duration-500">
