@@ -100,8 +100,8 @@ export async function loginPlayer(identifier: string, password: string) {
               ...userDoc.data()
             },
             message: 'Login successful!'
-          };
-        } else {
+          }
+      } else {
           return {
             success: true,
             user: {
@@ -112,7 +112,7 @@ export async function loginPlayer(identifier: string, password: string) {
             message: 'Login successful, but user profile not found.'
           };
         }
-    } catch (error: any) {
+  } c} atch (error: any) {
         console.error('Login error:', error);
         return {
             success: false,
