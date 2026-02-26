@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { AuthService } from '../services/authService';
 import { loginPlayer } from '../services/userService';
 import { StorageService } from '../services/storageService';
+import seedData from '../seedFirestore';
 import { Trophy, Lock, User as UserIcon, ArrowRight, RefreshCw, AlertTriangle } from 'lucide-react';
 import { User } from '../types';
 
@@ -36,10 +37,17 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
         setLoading(false);
     };
 
-    const handleReset = () => {
-        if (window.confirm("This will clear all local data and restore defaults. Proceed?")) {
+    const handleReset = async () => {
+        if (window.confirm("This will clear all local data and seed the Firestore database with demo users. Proceed?")) {
             setIsResetting(true);
             StorageService.clearData();
+            try {
+                await seedData();
+                alert("Database seeded successfully!");
+            } catch (e) {
+                console.error("Seeding failed", e);
+                alert("Seeding failed. Check console for details.");
+            }
             setTimeout(() => {
                 setIsResetting(false);
                 window.location.reload();
