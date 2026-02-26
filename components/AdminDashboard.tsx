@@ -154,8 +154,9 @@ export const AdminDashboard: React.FC = () => {
     // Stats
     const totalSessions = new Set(attendance.map(a => a.date)).size;
     const overallPresence = attendance.filter(a => a.status === AttendanceStatus.PRESENT).length;
-    const avgAttendance = totalSessions > 0
-        ? Math.round((overallPresence / (totalSessions * (players.length || 1))) * 100)
+    const playersCount = players ? players.length : 0;
+    const avgAttendance = totalSessions > 0 && playersCount > 0
+        ? Math.round((overallPresence / (totalSessions * playersCount)) * 100)
         : 0;
 
     if (loading) {
