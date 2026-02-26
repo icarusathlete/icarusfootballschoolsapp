@@ -88,31 +88,34 @@ export async function loginPlayer(identifier: string, password: string) {
                 },
                 message: 'Login successful!'
             };
-        } else {
-            // It's possible the user is an admin or coach whose data is in a different collection
-            const userDoc = await getDoc(doc(db, 'users', uid));
+        }
+
+        // If not in players collection, check users collection for admin/coach
+        const userDoc = await getDoc(doc(db, 'users', uid));
+
         if (userDoc.exists()) {
-          return {
+            return {
+                success: true,
+                user: {
+                    uid: uid,
+                    email: email,
+                    ...userDoc.data()
+                },
+                message: 'Login successful!'
+            };
+        }
+
+        // Fallback for users not found in either collection
+        return {
             success: true,
             user: {
-              uid: uid,
-              email: email,
-              ...userDoc.data()
-            },
-            message: 'Login successful!'
-          }
-      } else {
-          return {
-            success: true,
-            user: {
-              uid: uid,
-              email: email,
-              role: 'user' // Default role if not found in either collection
+                uid: uid,
+                email: email,
+                role: 'user'
             },
             message: 'Login successful, but user profile not found.'
-          };
-        }
-  } catch (error: any) {
+        };
+    } catch (error: any) {
         console.error('Login error:', error);
         return {
             success: false,
