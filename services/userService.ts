@@ -112,7 +112,7 @@ export async function loginPlayer(identifier: string, password: string) {
             message: 'Login successful, but user profile not found.'
           };
         }
-  } c} atch (error: any) {
+  } catch (error: any) {
         console.error('Login error:', error);
         return {
             success: false,
